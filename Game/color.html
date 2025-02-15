@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUBE</title>
+    <link rel="icon" type="image/x-icon" href="logo.png">
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer, cube;
+        let isMouseDown = false;
+        let mouseX = 0, mouseY = 0;
+        let rotationX = 0, rotationY = 0;
+        let lastMouseX = 0, lastMouseY = 0;
+
+        function init() {
+            // Set up the scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000); // Changed to black
+
+            // Set up the camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            // Set up the renderer
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // Create a cube geometry
+            const geometry = new THREE.BoxGeometry(1, 1, 1);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+            cube = new THREE.Mesh(geometry, material);
+            scene.add(cube);
+
+            // Event listeners for mouse control
+            document.addEventListener('mousedown', onMouseDown);
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+
+            // Animation loop
+            animate();
+        }
+
+        // Mouse down event
+        function onMouseDown(event) {
+            isMouseDown = true;
+            lastMouseX = event.clientX;
+            lastMouseY = event.clientY;
+        }
+
+        // Mouse move event
+        function onMouseMove(event) {
+            if (isMouseDown) {
+                // Calculate the change in mouse position
+                const deltaX = event.clientX - lastMouseX;
+                const deltaY = event.clientY - lastMouseY;
+
+                // Update rotation values
+                rotationX += deltaY * 0.01;  // Sensitivity for vertical movement
+                rotationY += deltaX * 0.01;  // Sensitivity for horizontal movement
+
+                // Update last mouse position
+                lastMouseX = event.clientX;
+                lastMouseY = event.clientY;
+            }
+        }
+
+        // Mouse up event
+        function onMouseUp() {
+            isMouseDown = false;
+        }
+
+        // Animation loop
+        function animate() {
+            // Apply rotation based on user input
+            cube.rotation.x = rotationX;
+            cube.rotation.y = rotationY;
+
+            // Render the scene
+            renderer.render(scene, camera);
+
+            // Call animate again
+            requestAnimationFrame(animate);
+        }
+
+        // Adjust camera and renderer size on window resize
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+
+        // Initialize the game
+        init();
+    </script>
+</body>
+</html>
